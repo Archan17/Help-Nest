@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { FaSignInAlt } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { login } from "../features/auth/authSlice";
+import Spinner from "../components/Spinner";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -10,15 +14,37 @@ function Login() {
 
   const { email, password } = formData;
 
-  function onChange(e) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { isLoading } = useSelector((state) => state.auth);
+
+  const onChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
-  }
+  };
 
-  function onSubmit(e) {
+  const onSubmit = (e) => {
     e.preventDefault();
+
+    const userData = {
+      email,
+      password,
+    };
+
+    dispatch(login(userData))
+      .unwrap()
+      .then((user) => {
+        toast.success(`Logged in as ${user.name}`);
+        navigate("/");
+      })
+      .catch(toast.error);
+  };
+
+  if (isLoading) {
+    return <Spinner />;
   }
 
   return (
@@ -27,7 +53,7 @@ function Login() {
         <h1>
           <FaSignInAlt /> Login
         </h1>
-        <p>Please Login To Get Support</p>
+        <p>Please log in to get support</p>
       </section>
 
       <section className="form">
@@ -40,7 +66,7 @@ function Login() {
               name="email"
               value={email}
               onChange={onChange}
-              placeholder="Enter your Email"
+              placeholder="Enter your email"
               required
             />
           </div>
@@ -52,7 +78,7 @@ function Login() {
               name="password"
               value={password}
               onChange={onChange}
-              placeholder="Enter your Password"
+              placeholder="Enter password"
               required
             />
           </div>
