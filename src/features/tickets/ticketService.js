@@ -1,6 +1,7 @@
 import axios from "axios";
+import {API} from '../../backend';
 
-const API_URL = "/api/tickets/";
+const API_URL = `${API}/tickets/`;
 
 // Create new ticket
 const createTicket = async (ticketData, token) => {
